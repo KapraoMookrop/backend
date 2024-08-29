@@ -81,6 +81,18 @@ export async function PUT(request) {
 }
 //-------------------------------------------------------------------------------------
 export async function DELETE(request) {
+  // Handle preflight request (OPTIONS)
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
+  }
+
   try {
     const { user_id } = await request.json();
     const res = await client.query(
@@ -104,4 +116,5 @@ export async function DELETE(request) {
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
     });
   }
-} 
+}
+
