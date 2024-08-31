@@ -81,40 +81,24 @@ export async function PUT(request) {
 }
 //-------------------------------------------------------------------------------------
 export async function DELETE(request) {
-  // Handle preflight request (OPTIONS)
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    });
-  }
-
   try {
-    const { user_id } = await request.json();
-    const res = await client.query(
-      "DELETE FROM tbl_user WHERE id = $1 RETURNING *",
-      [user_id]
-    );
-    if (res.rows.length === 0) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
-        status: 404,
-        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      const { id } = await request.json();
+      const res = await client.query('DELETE FROM tbl_user WHERE id = $1 RETURNING ', [id]);
+      if (res.rows.length === 0) {
+          return new Response(JSON.stringify({ error: 'User not found' }), {
+              status: 404,
+              headers: { 'Access-Control-Allow-Origin': '','Content-Type': 'application/json' },
+          });
+      }
+      return new Response(JSON.stringify(res.rows[0]), {
+          status: 200,
+          headers: { 'Access-Control-Allow-Origin': '','Content-Type': 'application/json' },
       });
-    }
-    return new Response(JSON.stringify(res.rows[0]), {
-      status: 200,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-    });
   } catch (error) {
-    console.error(error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-    });
+      console.error(error);
+      return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          headers: { 'Access-Control-Allow-Origin': '','Content-Type': 'application/json' },
+      });
   }
 }
-
